@@ -4,6 +4,9 @@
 #include "lang-utils.h"
 
 static int charIsIn(char target, char *string) {
+  if(!string) {
+    return 0;
+  }
   int i=0;
   while(string[i] != '\0') {
     if(target == string[i]) {
@@ -20,7 +23,12 @@ int trainSummary(char *text, int size, struct langSummary *summary) {
     return 1;
   }
 
-  int wordLenTotal, numWords, currentWordLength, isInsideWord, forbiddenCharCount;
+  int wordLenTotal = 0;
+  int numWords = 0;
+  int currentWordLength = 0;
+  int isInsideWord = 0;
+  int forbiddenCharCount = 0;
+  
   for(int i=0; i<size; i++) {
     char charCode = text[i];
     if(' ' < charCode && charCode <= 'z' && !charIsIn(charCode, "#+[]{}\\|")) {
