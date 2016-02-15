@@ -9,6 +9,8 @@
 
 static char* sInputStr = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
 
+
+
 int main(int argc, char *argv[]) {
   int inputBytesLen;
   char *inputBytes = hexStrToBytes(sInputStr, &inputBytesLen);
@@ -17,12 +19,26 @@ int main(int argc, char *argv[]) {
     return 1;
   }
   struct langSummary *englishSummary = newTrainedSummaryFromFile("resources/alice.txt");
+  /*
   for(int i=0; i<128; i++) {
-    printf("%d\n", englishSummary->freqTable[i]);
+    printf("%f\n", englishSummary->freqTable[i]);
   }
+  */
 
-  printf("Average word length is %f.\n", englishSummary->avgWordLength);
-  printf("forbiddenCharCount is %f.\n", englishSummary->forbiddenCharPercentage);
+  //printf("Average word length is %f.\n", englishSummary->avgWordLength);
+  //printf("forbiddenCharCount is %f.\n", englishSummary->forbiddenCharPercentage);
+
+  struct langSummary attemptSummary;
+  for(char c=' '; c <= '~'; c++) {
+    char *attemptStr = xORByChar(inputBytes, c, inputBytesLen);
+    trainSummary(&attemptSummary, attemptStr, inputBytesLen);
+    float summarySimilarity = compareSummaries(englishSummary, &attemptSummary);
+    if(summarySimilarity < 3) {
+      printf("Success for key %c with score %f\n", c, summarySimilarity);
+      printf("Decrypted message is:\n%s\n", attemptStr);
+    }
+    free(attemptStr);
+  }
 
   free(englishSummary);
   free(inputBytes);

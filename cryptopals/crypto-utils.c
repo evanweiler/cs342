@@ -63,3 +63,13 @@ int cmpByteArrays(char *array1, char* array2, int length){
   }
   return 0;
 }
+
+// return's a malloc'd output string that the caller must free;
+char *xORByChar(char *input, char key, int size) {
+  char *output = (char *)malloc(sizeof(char)*size + 1);
+  for(int i=0; i<size; i++) {
+    output[i] = input[i] ^ key;
+  }
+  output[size] = '\0';
+  return output;
+}
