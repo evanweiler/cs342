@@ -12,20 +12,15 @@ static char* sXORStr = "686974207468652062756c6c277320657965";
 
 static char* sOutputStr = "746865206b696420646f6e277420706c6179";
 
-int cmpByteArrays(char *array1, char* array2, int length){
-  for(int i=0; i<length; i++) {
-    if(array1[i] != array2[i]) {
-      return 1;
-    }
-  }
-  return 0;
-}
-
 int main(int argc, char *argv[]) {
-  int len = strlen(sInputStr) * 4;
+  int len;
   char *xorBytes = hexStrToBytes(sXORStr, &len);
   char *inputBytes = hexStrToBytes(sInputStr, &len);
   char* resultBytes = (char*)malloc(len);
+  if(!resultBytes) {
+    printf("Failure! Couldn't alloc buffer for output string.\n");
+    return 1;
+  }
 
   for(int i=0; i<len; i++) {
     resultBytes[i] = inputBytes[i] ^ xorBytes[i];
