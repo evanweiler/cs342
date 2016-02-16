@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <tgmath.h>
+#include <float.h>
 #include "lang-utils.h"
 
 static int charIsIn(char target, char *string) {
@@ -36,7 +37,28 @@ int trainSummary(struct langSummary *summary, char *text, int size) {
 
   for(int i=0; i<size; i++) {
     char charCode = text[i];
-    if(' ' < charCode && charCode <= 'z' && !charIsIn(charCode, "`*#+[]{}\\|")) {
+    if ('A' <= charCode && charCode <= 'Z') {
+      charCode += 32; // to make the letter lowercase!
+    }
+    if(('0' <= charCode && charCode <= '9') ||
+      ('a' <= charCode && charCode <= 'z')) {
+        freqCount[charCode]++;
+        currentWordLength++;
+        isInsideWord = 1;
+      } else {
+        if (charCode == ' ' || charCode == '\n') {
+          isInsideWord = 0;
+          wordLenTotal += currentWordLength;
+          numWords++;
+        } else if (!charIsIn(charCode, "-()&.,!?$\"';:")) {
+          forbiddenCharCount++;
+        } else {
+          //freqCount[charCode]++;
+        }
+        currentWordLength = 0;
+      }
+    /*
+    if(' ' < charCode && charCode <= 'z' && !charIsIn(charCode, "=^`*#+<>[]{}/\\|")) {
       freqCount[charCode]++;
       isInsideWord = 1;
       currentWordLength++;
@@ -53,14 +75,30 @@ int trainSummary(struct langSummary *summary, char *text, int size) {
         forbiddenCharCount++;
       }
     }
+    */
   }
 
-  for(int i=0; i<128; i++) {
-    // percentage of character appearance in all valid characters
-    summary->freqTable[i] = freqCount[i] / (float) (size - forbiddenCharCount);
+  int validCharacterCount = size - forbiddenCharCount;
+
+  if (numWords != 0) {
+    summary->avgWordLength = wordLenTotal / (float) numWords;
+  } else {
+    summary->avgWordLength = (float) size;
   }
-  summary->avgWordLength = wordLenTotal / (float) numWords;
-  summary->forbiddenCharPercentage = forbiddenCharCount / (float) size;
+  if (validCharacterCount != 0 || size == 0) {
+    summary->forbiddenCharPercentage = forbiddenCharCount / (float) size;
+    for(int i=0; i<128; i++) {
+      // percentage of character appearance in all valid characters
+      summary->freqTable[i] = freqCount[i] / (float) validCharacterCount;
+    }
+  } else {
+    summary->forbiddenCharPercentage = 1.0;
+    for(int i=0; i<128; i++) {
+      // percentage of character appearance in all valid characters
+      summary->freqTable[i] = 0.0;
+    }
+  }
+  //printf("%f, %f\n", summary->avgWordLength, summary->forbiddenCharPercentage);
   return 0;
 }
 
@@ -98,6 +136,7 @@ float compareSummaries(struct langSummary *reference, struct langSummary *target
   }
   float wordLenDiff = fabsf(reference->avgWordLength - target->avgWordLength);
 
+  //printf("%f, %f, %f\n", freqDiffSum, wordLenDiff, target->forbiddenCharPercentage);
 
-  return freqDiffSum * 1 + (wordLenDiff < 1.0 ? wordLenDiff : 1.0) * 2 + target->forbiddenCharPercentage * 1;
+  return freqDiffSum * 0.5 + wordLenDiff * 1 + target->forbiddenCharPercentage * 1;
 }

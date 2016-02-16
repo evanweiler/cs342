@@ -28,17 +28,7 @@ int main(int argc, char *argv[]) {
   //printf("Average word length is %f.\n", englishSummary->avgWordLength);
   //printf("forbiddenCharCount is %f.\n", englishSummary->forbiddenCharPercentage);
 
-  struct langSummary attemptSummary;
-  for(char c=' '; c <= '~'; c++) {
-    char *attemptStr = xORByChar(inputBytes, c, inputBytesLen);
-    trainSummary(&attemptSummary, attemptStr, inputBytesLen);
-    float summarySimilarity = compareSummaries(englishSummary, &attemptSummary);
-    if(summarySimilarity < 3) {
-      printf("Success for key %c with score %f\n", c, summarySimilarity);
-      printf("Decrypted message is:\n%s\n", attemptStr);
-    }
-    free(attemptStr);
-  }
+  crackSingleCharXOR(inputBytes, inputBytesLen, englishSummary, 2);
 
   free(englishSummary);
   free(inputBytes);
