@@ -136,10 +136,8 @@ int crackSingleCharXOR(char *input, int size, struct langSummary *referenceSumma
     printf("Decrypted string is:\n");
     printf("%s\n", attempts[bestAttempt]);
   }
-  for(int i=0; i<=126; i++) {
-    if(1) {
-      free(attempts[i]);
-    }
+  for(int i=0; i<127; i++) {
+    free(attempts[i]);
   }
   return 0;
 }

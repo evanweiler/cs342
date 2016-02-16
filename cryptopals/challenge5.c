@@ -11,21 +11,16 @@ int main(int argc, char *argv[]) {
   int keyLen = strlen(sKey);
   int inputLen = strlen(sInputStr);
 
-  char *outputBytes = (char *)malloc(inputLen);
+  char *outputBytes = (char *)malloc(inputLen + 1);
   outputBytes[inputLen] = '\0';
-
-  printf("%s\n", outputBytes);
 
   int k = 0;
   for(int i=0; i<inputLen; i++) {
-    outputBytes[i] = sInputStr[i] ^ sKey[k];
-    k++;
-    k %= keyLen;
+    outputBytes[i] = sInputStr[i] ^ sKey[i % keyLen];
   }
 
   int hexLen;
   char *hexOut = bytesToHexStr(outputBytes, &hexLen);
-
 
   printf("%s\n", hexOut);
 

@@ -6,7 +6,7 @@
 #include "lang-utils.h"
 #include "base64.h"
 
-// Compile with: gcc challenge4.c base64.c lang-utils.c crypto-utils.c -g -o challenge4
+// Compile with: gcc challenge4.c crypto-utils.c lang-utils.c -lm -g -o challenge4
 
 int main(int argc, char *argv[]) {
   struct langSummary *englishSummary = newTrainedSummaryFromFile("resources/alice.txt");
@@ -22,7 +22,6 @@ int main(int argc, char *argv[]) {
 
   int lineNum = 1;
   while((read = getline(&line, &lineLen, file)) != -1) {
-    //printf("Trying line number %d.\n", lineNum);
     read--;
     if(line[read] == '\n') {
       line[read] = '\0';
@@ -32,17 +31,19 @@ int main(int argc, char *argv[]) {
     if(!lineBytes) {
       printf("Failed to convert hex to bytes\n");
     }
-    if(crackSingleCharXOR(lineBytes, lineBytesLen, englishSummary, 2)) {
+    if(crackSingleCharXOR(lineBytes, lineBytesLen, englishSummary, 3.0)) {
       printf("Cracked line number %d:\n", lineNum);
       printf("%s\n", line);
-      /*
       fclose(file);
+      free(lineBytes);
       free(englishSummary);
-      return 0; */
+      free(line);
+      return 0;
     }
     free(lineBytes);
     lineNum++;
   }
+  free(line);
   fclose(file);
   free(englishSummary);
 }

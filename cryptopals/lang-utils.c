@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <tgmath.h>
 #include <float.h>
+#include <math.h>
 #include "lang-utils.h"
 
 static int charIsIn(char target, char *string) {
@@ -22,7 +23,7 @@ static int charIsIn(char target, char *string) {
 int trainSummary(struct langSummary *summary, char *text, int size) {
   if(!text || !summary) {
     printf("Could not train summary due to null inputs\n");
-    return 1;
+    exit(1);
   }
 
   int wordLenTotal = 0;
@@ -57,25 +58,6 @@ int trainSummary(struct langSummary *summary, char *text, int size) {
         }
         currentWordLength = 0;
       }
-    /*
-    if(' ' < charCode && charCode <= 'z' && !charIsIn(charCode, "=^`*#+<>[]{}/\\|")) {
-      freqCount[charCode]++;
-      isInsideWord = 1;
-      currentWordLength++;
-    } else {
-      if (isInsideWord) {
-        if (charCode == ' ' || charCode == '\n') {
-          wordLenTotal += currentWordLength;
-          numWords++;
-        }
-        currentWordLength = 0;
-        isInsideWord = 0;
-      }
-      if(charCode != ' ' && charCode != '\n') {
-        forbiddenCharCount++;
-      }
-    }
-    */
   }
 
   int validCharacterCount = size - forbiddenCharCount;
@@ -130,13 +112,11 @@ struct langSummary *newTrainedSummaryFromFile(char *filePath) {
 }
 
 float compareSummaries(struct langSummary *reference, struct langSummary *target) {
-  float freqDiffSum = 0.0;
+  float freqScore = 0.0;
   for(int i=0; i<128; i++) {
-    freqDiffSum += fabsf(reference->freqTable[i] - target->freqTable[i]);
+    freqScore += powf(reference->freqTable[i] - target->freqTable[i], 2.0) / (reference->freqTable[i] ? reference->freqTable[i] : FLT_MIN);
   }
   float wordLenDiff = fabsf(reference->avgWordLength - target->avgWordLength);
 
-  //printf("%f, %f, %f\n", freqDiffSum, wordLenDiff, target->forbiddenCharPercentage);
-
-  return freqDiffSum * 0.5 + wordLenDiff * 1 + target->forbiddenCharPercentage * 1;
+  return freqScore * 0.5 + wordLenDiff * 1 + (target->forbiddenCharPercentage ? FLT_MAX : 0.0);
 }

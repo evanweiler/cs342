@@ -19,14 +19,6 @@ int main(int argc, char *argv[]) {
     return 1;
   }
   struct langSummary *englishSummary = newTrainedSummaryFromFile("resources/alice.txt");
-  /*
-  for(int i=0; i<128; i++) {
-    printf("%f\n", englishSummary->freqTable[i]);
-  }
-  */
-
-  //printf("Average word length is %f.\n", englishSummary->avgWordLength);
-  //printf("forbiddenCharCount is %f.\n", englishSummary->forbiddenCharPercentage);
 
   crackSingleCharXOR(inputBytes, inputBytesLen, englishSummary, 2);
 
