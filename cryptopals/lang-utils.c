@@ -48,14 +48,12 @@ int trainSummary(struct langSummary *summary, char *text, int size) {
         isInsideWord = 1;
       } else {
         if (charCode == ' ' || charCode == '\n') {
-          isInsideWord = 0;
           wordLenTotal += currentWordLength;
           numWords++;
         } else if (!charIsIn(charCode, "-()&.,!?$\"';:")) {
           forbiddenCharCount++;
-        } else {
-          //freqCount[charCode]++;
         }
+        isInsideWord = 0;
         currentWordLength = 0;
       }
   }
@@ -84,27 +82,34 @@ int trainSummary(struct langSummary *summary, char *text, int size) {
   return 0;
 }
 
-//returns allocated int array of length 128, caller must free
+//returns an allocated language summary that the caller must free
 struct langSummary *newTrainedSummaryFromFile(char *filePath) {
   FILE *file = fopen(filePath, "r");
   if(!file) {
         printf("Failed to open file %s.\n", filePath);
-        return NULL;
+        exit(1);
   }
   size_t size = 0;
   fseek(file, 0, SEEK_END);
   size = ftell(file);
   rewind(file);
   char *binary = (char *) malloc(size);
+  if(!binary) {
+    printf("Failure! Could not allocate memory for file text\n");
+  }
   if(size != fread(binary, sizeof(char), size, file)) {
         free(binary);
         fclose(file);
         printf("Could not read file %s.\n", filePath);
-        return NULL;
+        exit(1);
   }
   fclose(file);
 
   struct langSummary *newSummary = (struct langSummary*)malloc(sizeof(struct langSummary));
+  if(!newSummary) {
+    printf("Failure! Could not allocate memory for newSummary\n");
+    exit(1);
+  }
   trainSummary(newSummary, binary, size);
 
   free(binary);

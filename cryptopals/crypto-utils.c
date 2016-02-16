@@ -108,7 +108,8 @@ int cmpByteArrays(char *array1, char* array2, int length){
 char *xORByChar(char *input, char key, int size) {
   char *output = (char *)malloc(sizeof(char)*(size + 1));
   if(!output) {
-    printf("Failed to allocated for new xor string.");
+    printf("Failed to allocated for new xor string with key '%c'.", key);
+    exit(1);
   }
   for(int i=0; i<size; i++) {
     output[i] = input[i] ^ key;

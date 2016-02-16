@@ -4,7 +4,7 @@
 #include "crypto-utils.h"
 #include "base64.h"
 
-// Compile with: gcc challenge1.c base64.c crypto-utils.c -g -o challenge1
+// Compile with: gcc challenge1.c base64.c lang-utils.c crypto-utils.c -lm -g -o challenge1
 
 static char* sInputStr = "49276d206b696c6c696e6720796f7572"
                          "20627261696e206c696b65206120706f"
@@ -27,7 +27,12 @@ int main(int argc, char *argv[]) {
     printf("Failure! Couldn't alloc buffer for base64 string.\n");
     return 1;
   }
-  Base64encode(base64Str, bytes, bytesLen);
+
+  if(!Base64encode(base64Str, bytes, bytesLen)){
+    printf("Failure! Couldn't encode bytes to base64.\n");
+    return 1;
+  }
+
 
   if (strcmp(base64Str, sOutputStr) == 0) {
     printf("Success!\n");

@@ -7,7 +7,7 @@ struct langSummary {
   float forbiddenCharPercentage;
 };
 
-// returns an allocated int array of length 128, caller must free
+// returns an allocated summary struct that the caller must free
 struct langSummary *newTrainedSummaryFromFile(char *fileName);
 
 int trainSummary(struct langSummary *summary, char *text, int size);

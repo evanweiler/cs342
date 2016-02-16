@@ -5,11 +5,9 @@
 #include "lang-utils.h"
 #include "base64.h"
 
-// Compile with: gcc challenge3.c base64.c lang-utils.c crypto-utils.c -g -o challenge2
+// Compile with: gcc challenge3.c base64.c lang-utils.c crypto-utils.c -lm -g -o challenge2
 
 static char* sInputStr = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
-
-
 
 int main(int argc, char *argv[]) {
   int inputBytesLen;
@@ -20,7 +18,10 @@ int main(int argc, char *argv[]) {
   }
   struct langSummary *englishSummary = newTrainedSummaryFromFile("resources/alice.txt");
 
-  crackSingleCharXOR(inputBytes, inputBytesLen, englishSummary, 2);
+  if(!crackSingleCharXOR(inputBytes, inputBytesLen, englishSummary, 2)) {
+    printf("Failure! Could not decrypt input.");
+    return 1;
+  }
 
   free(englishSummary);
   free(inputBytes);
